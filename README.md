@@ -38,7 +38,7 @@ We chose to focus on improving the **segmentation model**, leaving the detection
 #### Key Changes:
 
 1. **Resolution Upgrade**  
-   Replaced the original **2D low-resolution nnU-Net** with a **3D full-resolution** nnU-Net. While more computationally intensive, 3D models have shown improved performance for volumetric segmentation tasks, particularly in medical imaging [Isensee et al., 2021].
+   Replaced the original **2D low-resolution nnU-Net** with a **3D full-resolution** nnU-Net. While more computationally intensive, 3D models have shown improved performance for volumetric segmentation tasks, particularly in medical imaging (e.g. [Isensee et al., 2021](https://pubmed.ncbi.nlm.nih.gov/33288961/)).
 
 2. **Loss Function**  
    Instead of using only **Dice loss**, we applied a **compound loss**:  
