@@ -2,7 +2,7 @@
 
 This repository is a fork of the official Panorama Challenge baseline: [Original Baseline Repository](https://github.com/DIAGNijmegen/PANORAMA_baseline)
 
-We used this baseline as the foundation for our submission. Due to time and computational constraints, we made only minimal changes to the baseline directly. Our main changes were made in a fork of the [`nnU-Net`](https://github.com/MIC-DKFZ/nnUNet) repository, where we customized the training procedure. The forked repository can be found here: [Forked nnU-Net](https://github.com/melodyjansen/nnUNet/tree/master)
+We used this baseline as the foundation for our project. Due to time and computational constraints, we made only minimal changes to the baseline directly. Our main changes were made in a fork of the [`nnU-Net`](https://github.com/MIC-DKFZ/nnUNet) repository, where we customized the training procedure. The forked repository can be found here: [Forked nnU-Net](https://github.com/melodyjansen/nnUNet/tree/master)
 
 ---
 
