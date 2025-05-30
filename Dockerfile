@@ -4,7 +4,7 @@ FROM nvidia/cuda:12.2.0-runtime-ubuntu20.04 AS base
 # Use a 'large' base container to show-case how to load pytorch and use the GPU (when enabled)
 
 # Ensures that Python output to stdout/stderr is not buffered: prevents missing information when terminating
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 ENV PYTHONWARNINGS="ignore"
 
 
@@ -13,12 +13,15 @@ RUN apt-get update && \
   add-apt-repository ppa:deadsnakes/ppa && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
   git \
+  curl \
   wget \
   unzip \
   libopenblas-dev \
-  python3.9 \
-  python3.9-dev \
-  python3-pip \
+  python3.11 \
+  python3.11-dev \
+  python3.11-distutils \
+  gcc \
+  build-essential \
   nano \
   && \
   apt-get clean autoclean && \
@@ -35,14 +38,15 @@ USER user
 
 COPY --chown=user:user requirements.txt /opt/app/
 
+# Install pip for Python 3.11
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+
 # You can add any Python dependencies to requirements.txt
-RUN python3.9 -m pip install \
+RUN python3.11 -m pip install \
     --user \
     --no-cache-dir \
     --no-color \
     --requirement /opt/app/requirements.txt
-
-
 
 ### Clone nnUNet
 # Configure Git, clone the repository without checking out, then checkout the specific commit
@@ -50,7 +54,7 @@ RUN git config --global advice.detachedHead false && \
     git clone https://github.com/MIC-DKFZ/nnUNet.git /opt/algorithm/nnunet/ 
 
 # Install a few dependencies that are not automatically installed
-RUN pip3 install \
+RUN python3.11 -m pip install \
         -e /opt/algorithm/nnunet \
         graphviz \
         onnx \
@@ -72,4 +76,4 @@ ENV nnUNet_raw="/opt/algorithm/nnunet/nnUNet_raw" \
     nnUNet_preprocessed="/opt/algorithm/nnunet/nnUNet_preprocessed" \
     nnUNet_results="/opt/algorithm/nnunet/nnUNet_results"
 
-ENTRYPOINT [ "python3.9", "-m", "process" ]
+ENTRYPOINT [ "python3.11", "-m", "process" ]
