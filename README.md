@@ -1,3 +1,91 @@
+# PANORAMA Challenge – AI in Medical Imaging
+
+This repository is a fork of the official Panorama Challenge baseline: [Original Baseline Repository](https://github.com/DIAGNijmegen/PANORAMA_baseline)
+
+We used this baseline as the foundation for our submission. Due to time and computational constraints, we made only minimal changes to the baseline directly. Our main changes were made in a fork of the [`nnU-Net`](https://github.com/MIC-DKFZ/nnUNet) repository, where we customized the training procedure. The forked repository can be found here: [Forked nnU-Net](https://github.com/melodyjansen/nnUNet/tree/master)
+
+---
+
+## 🔧 Modifications Overview
+
+### In This Repository
+- Forked from the original Panorama baseline.
+- Added our own result folder under `src/nnUNet_results/` to include output data and/or logs.
+- Adjusted README with added documentation to reflect our setup.
+
+### 🔹 Training Data
+
+The PANORAMA dataset contains approximately 3000 cases split into:
+
+- **2238** training samples (fully accessible)  
+- **86** hidden validation cases  
+- ~**400** hidden test cases  
+
+Each case includes anonymized CECT scans and annotations (tumor boundaries, labels, etc.). All data is provided under the **CC BY-NC 4.0** license.
+
+For our experiments:  
+- We used only the **first batch** of training data: [Batch 1](https://zenodo.org/records/13715870)  
+- **6 images were discarded** due to mismatches between CT volumes and labels.  
+- Final training was done on **551 cases** after preprocessing with `nnUNetv2_plan_and_preprocess`.  
+- Although nnU-Net is typically trained using **5-fold cross-validation**, we only trained on **fold 0** due to limited compute.
+
+---
+
+### 🔹 Our Modified Model
+
+We chose to focus on improving the **segmentation model**, leaving the detection pipeline unaltered.
+
+#### Key Changes:
+
+1. **Resolution Upgrade**  
+   Replaced the original **2D low-resolution nnU-Net** with a **3D full-resolution** nnU-Net. While more computationally intensive, 3D models have shown improved performance for volumetric segmentation tasks, particularly in medical imaging [Isensee et al., 2021].
+
+2. **Loss Function**  
+   Instead of using only **Dice loss**, we applied a **compound loss**:  
+   - 0.5 × Dice loss  
+   - 0.5 × TopK loss (with `k = 10%`)  
+
+   This choice was guided by literature showing compound losses improve segmentation performance (e.g. [Ma et al., 2021](https://www.sciencedirect.com/science/article/pii/S1361841521000815)).  
+   
+   > TopK loss emphasizes difficult voxels by computing cross-entropy over the hardest 10% of predictions.
+
+3. **Training Details**  
+   - Model trained for **250 epochs**  
+   - Training took approximately **7 hours** on GPU (csedu cluster)  
+   - Only **fold 0** used (80% train, 20% validation split)  
+
+---
+
+## 📊 Evaluation Strategy
+
+We were unable to submit our modified container to the Grand Challenge platform due to time and Docker configuration issues. Therefore, we performed our own evaluation using held-out training data.
+
+### Dataset:
+
+- Used **54 images** from the **second batch** of training data (unseen by the model)  
+- Due to memory constraints, only **16 images** were ultimately evaluated  
+
+### Metrics:
+
+- **Dice Coefficient** (0–1): measures overlap between predicted and ground truth masks  
+- **True Positives (TP)**: correctly predicted lesion voxels  
+- **False Positives (FP)**: incorrectly predicted lesion voxels  
+- **True Negatives (TN)**: correctly predicted background voxels  
+- **False Negatives (FN)**: missed lesion voxels  
+
+The evaluation was conducted across the following labels:  
+- PDAC lesion  
+- Veins  
+- Arteries  
+- Pancreas parenchyma  
+- Pancreatic duct  
+- Common bile duct  
+
+
+---
+# Original Baseline README.md
+
+
 # Baseline Algorithm for the [PANORAMA challenge](https://panorama.grand-challenge.org/): Pancreatic Cancer Diagnosis - Radiologists Meet AI
 This repository contains the baseline algorithm for the [PANORAMA challenge](https://panorama.grand-challenge.org/). Model weights were uploaded to Zenodo and can be downloaded using this link: [https://zenodo.org/records/11160381](https://zenodo.org/records/11160381) The algorithm can be directly accessed and used at [https://grand-challenge.org/algorithms/baseline-panorama/](https://grand-challenge.org/algorithms/baseline-panorama/).
 
